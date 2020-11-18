@@ -1,0 +1,41 @@
+import torch.nn as nn
+
+class AlexNet(nn.Module):
+    def __init__(self):
+        super(AlexNet, self).__init__()
+        #若欲快速构建网络，或不需要太多过程，直接使用Sequential()即可。
+        #Sequential本身也是一个nn.Module的类，是一个有序的容器。
+        #Sequential()支持对层的索引访问，如AlexNet[0].parameters可获得模型的参数。
+        
+        self.features = nn.sequential(
+            nn.Conv2d(),
+            nn.ReLU(inplace = True),
+            nn.MaxPool2d(),
+            nn.Conv2d(),
+            nn.ReLU(inplace = True),
+            nn.MaxPool2d(),
+            nn.Conv2d(),
+            nn.ReLU(inplace = True),
+            nn.Conv2d(),
+            nn.ReLU(inplace = True),
+            nn.Conv2d(),
+            nn.ReLU(inplace = True),
+            nn.MaxPool2d(),
+        )
+        
+        self.avgpool = nn.AdaptiveAcgPool2d((6, 6))
+        self.classifier = nn.Sequential(
+            nn.Dropout(),
+            nn.Linear(),
+            nn.ReLU(inplace = True),
+            nn.Dropout(),
+            nn.Linear(),
+            nn.ReLU(inplace=True),
+        )
+        
+    def forward(self, x):
+        x = self.features(x)
+        x = self.avgpool(x)
+        x = x.view(x.size(0),-1)
+        x = self.classifier(x)
+        return x
